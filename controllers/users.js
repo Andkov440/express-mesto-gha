@@ -16,7 +16,7 @@ const getUsers = (req, res) => {
 };
 
 const getUser = (req, res) => {
-  User.findById(req.params.id)
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         res.status(NOT_FOUND_ERROR).send({ message: 'Пользователь по  _id не найден' });
@@ -32,8 +32,13 @@ const getUser = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  const {
+    name, about, avatar, _id,
+  } = req.body;
+
+  User.create({
+    name, about, avatar, _id,
+  })
     .then((user) => res.status(CREATE_OK).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
