@@ -18,7 +18,12 @@ const getUser = (req, res) => {
       }
       return res.status(REQUEST_OK).send(user);
     })
-    .catch(() => res.status(SERVER_ERROR).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
+        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные пользователя' });
+      }
+      return res.status(SERVER_ERROR).send({ message: 'Произошла ошибка' });
+    });
 };
 
 const createUser = (req, res) => {
