@@ -1,18 +1,13 @@
 const Card = require('../models/card');
 
 const {
-  VALIDATION_ERROR, NOT_FOUND_ERROR, CAST_ERROR, REQUEST_OK, CREATE_OK,
+  VALIDATION_ERROR, NOT_FOUND_ERROR, SERVER_ERROR, REQUEST_OK, CREATE_OK,
 } = require('../errors/errors');
 
 const getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.send(cards.map((element) => element)))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные карточки' });
-      }
-      return res.status(CAST_ERROR).send({ message: 'Произошла ошибка' });
-    });
+    .then((cards) => res.send(cards))
+    .catch(() => res.status(SERVER_ERROR).send({ message: 'Произошла ошибка' }));
 };
 
 const createCard = (req, res) => {
@@ -26,7 +21,7 @@ const createCard = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные при создании карточки' });
       }
-      return res.status(CAST_ERROR).send({ message: 'Произошла ошибка' });
+      return res.status(SERVER_ERROR).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -39,12 +34,7 @@ const deleteCard = (req, res) => {
     }
     return res.status(REQUEST_OK).send(card);
   })
-    .catch((err) => {
-      if ((err.name === 'ValidationError') || (err.kind === 'ObjectId')) {
-        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные удаляемой карточки' });
-      }
-      return res.status(CAST_ERROR).send({ message: 'Произошла ошибка' });
-    });
+    .catch(() => res.status(SERVER_ERROR).send({ message: 'Произошла ошибка' }));
 };
 
 const likeCard = (req, res) => {
@@ -58,12 +48,7 @@ const likeCard = (req, res) => {
     }
     return res.status(REQUEST_OK).send(card);
   })
-    .catch((err) => {
-      if ((err.name === 'ValidationError') || (err.kind === 'ObjectId')) {
-        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные для постановки лайка' });
-      }
-      return res.status(CAST_ERROR).send({ message: 'Произошла ошибка' });
-    });
+    .catch(() => res.status(SERVER_ERROR).send({ message: 'Произошла ошибка' }));
 };
 
 const dislikeCard = (req, res) => {
@@ -77,12 +62,7 @@ const dislikeCard = (req, res) => {
     }
     return res.status(REQUEST_OK).send(card);
   })
-    .catch((err) => {
-      if ((err.name === 'ValidationError') || (err.kind === 'ObjectId')) {
-        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные для снятия лайка' });
-      }
-      return res.status(CAST_ERROR).send({ message: 'Произошла ошибка' });
-    });
+    .catch(() => res.status(SERVER_ERROR).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports = {
