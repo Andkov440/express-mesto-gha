@@ -1,34 +1,34 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const userRoutes = require('./routes/users');
-const cardRoutes = require('./routes/cards');
-
-const { NOT_FOUND_ERROR } = require('./errors/errors');
+const {
+  validationCreateUser,
+  validationLogin,
+} = require('./middlewares/validations');
+const errorHandler = require('./middlewares/errorHandler');
+const { createUser, login } = require('./controllers/users');
+const routes = require('./routes');
+// eslint-disable-next-line import/order
+const { errors } = require('celebrate');
+// eslint-disable-next-line import/order
+const cookieParser = require('cookie-parser');
 
 const { PORT = 3000 } = process.env;
 const app = express();
+
+app.post('/signin', validationLogin, login);
+app.post('/signup', validationCreateUser, createUser);
+
+mongoose.connect('mongodb://localhost:27017/mestodb', {
+  useNewUrlParser: true,
+});
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '631a64940a2d0417c16c606e',
-  };
-
-  next();
-});
-
 app.use(express.json());
+app.use(cookieParser());
 
-app.use(userRoutes);
-app.use(cardRoutes);
-
-app.use((req, res) => {
-  res.status(NOT_FOUND_ERROR).send({ message: 'Страница не найдена' });
-});
-
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useNewUrlParser: true,
-});
+app.use(routes);
+app.use(errors());
+app.use(errorHandler);
